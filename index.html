@@ -72,27 +72,6 @@
 			</div>
 		</form>	
 	</div>
-	
-	<!-- modal for adding an entry to gift idea table. Requires a person plus the idea -->
-	<div data-role="modal" id="add-gift-person">
-		<h3>new gift for <span id="nowOccasion"></span></h3>
-		<form>
-			<div class="formBox">
-				<select id="list-per">
-					<option value="0">Choose person</option>
-					<!-- list of options built from person list -->
-				</select>
-			</div>
-            <div class="formBox">
-				<input type="text" id="new-idea-person" value="" placeholder="" class=""/>
-                <input type="checkbox" id= "purchased-person" value=""/> 
-			</div>
-			<div class="formBox">
-				<input type="button" class="btnCancel" value="CANCEL" />
-				<input type="button" class="btnSave" value="SAVE" />
-			</div>
-		</form>	
-	</div>
 	<!-- modal for adding an entry to gift idea table. Requires a occasion plus the idea -->
 	<div data-role="modal" id="add-gift-occasion">
 		<h3>new gift for <span id="nowPerson"></span></h3>
@@ -113,6 +92,27 @@
 			</div>
 		</form>	
 	</div>
+	<!-- modal for adding an entry to gift idea table. Requires a person plus the idea -->
+	<div data-role="modal" id="add-gift-person">
+		<h3>new gift for <span id="nowOccasion"></span></h3>
+		<form>
+			<div class="formBox">
+				<select id="list-per">
+					<option value="0">Choose person</option>
+					<!-- list of options built from person list -->
+				</select>
+			</div>
+            <div class="formBox">
+				<input type="text" id="new-idea-person" value="" placeholder="" class=""/>
+                <input type="checkbox" id= "purchased-person" value=""/> 
+			</div>
+			<div class="formBox">
+				<input type="button" class="btnCancel" value="CANCEL" />
+				<input type="button" class="btnSave" value="SAVE" />
+			</div>
+		</form>	
+	</div>
+	
     
 
 <!--<script type="text/javascript" src="cordova.js"></script>-->

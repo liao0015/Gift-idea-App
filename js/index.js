@@ -5,8 +5,13 @@ var occasionGift = document.getElementById("gifts-for-occasion");
 var peopleGift = document.getElementById("gifts-for-person");
 var modals = document.querySelectorAll("[data-role=modal]");
 var btnSave = document.querySelectorAll(".btnSave");
+
+var occList = document.getElementById("list-occ");
+var perList = document.getElementById("list-per");
 var db = null;
 
+var personId;
+var occasionId;
 document.addEventListener("DOMContentLoaded", onDeviceReady, false);
 //document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -15,7 +20,7 @@ function onDeviceReady(){
 }
 
 function checkDB(){
-    db = openDatabase('Rho', '', 'DataApp Rho', 1024*1024);
+    db = openDatabase('newGate', '', 'DataApp newgate', 1024*1024);
     if(db.version == ''){
         console.info('First time running... create tables'); 
         db.changeVersion('', '1.0',
@@ -50,8 +55,8 @@ function checkDB(){
                     console.info("successfully completed the transaction of incrementing the version number");  
                 });
         addNavHandlers();
-    }else{
-		
+    }
+	else{	
 		//save new person input into table people
 		btnSave[0].addEventListener("click", function(){
 			var newName = document.getElementById("new-per").value;
@@ -79,40 +84,6 @@ function checkDB(){
 			}
 			else{alert("Please enter a new occasion");}
 		});
-		//save new occasion input into table gifts
-		/*btnSave[2].addEventListener("click", function(){
-			var newGift = document.getElementById("new-idea-person").value;
-			var personId=9;
-			var occasionId=9;
-			var purchased=1;
-			console.log("user input: "+newGift);
-			if(newGift !== ""){
-				db.transaction(function(tx){
-					//tx.executeSql('SELECT g.purchased, g.gift_id, g.gift_idea, o.occ_name FROM gift AS g WHERE JOIN occasions AS o ON o.occ_id = g.occ_id WHERE g.person_id = ? ORDER BY o.occ_name, g.gift_idea');
-					tx.executeSql('INSERT INTO gifts(person_id, occ_id, gift_idea, purchased)VALUES (?,?,?,?)',[personId, occasionId, newGift, purchased]);
-				});
-				closeModal();
-				displayPersonGifts();
-			}
-			else{alert("Please enter a new gift idea");}
-		});*/
-		//save new occasion input into table gifts
-		/*btnSave[3].addEventListener("click", function(){
-			var newGift = document.getElementById("new-idea-occasion").value;
-			var personId=8;
-			var occasionId=8;
-			var purchased=1;
-			console.log("user input: "+newGift);
-			if(newGift !== ""){
-				db.transaction(function(tx){
-					tx.executeSql('INSERT INTO gifts(person_id, occ_id, gift_idea, purchased)VALUES (?,?,?,?)',[personId, occasionId, newGift, purchased]);
-				});
-				closeModal();
-				displayOccasionGifts();
-			}
-			else{alert("Please enter a new gift idea");}
-		});
-*/		
 		//display the version and add event handlers
         console.info('Version: ', db.version)   
         addNavHandlers();
@@ -126,8 +97,9 @@ function addNavHandlers(){
     console.info("Adding nav handlers");
     displayPeople();
 	displayOccasions();
+	displayPersonGifts();
 	displayOccasionGifts();
-	//displayOccasionGifts();
+	
 }
 
 function displayPeople() {
@@ -141,7 +113,7 @@ function displayPeople() {
 				optOutput.innerHTML = "";
 				for (var i = 0; i < rs.rows.length; i++){
 					output[0].innerHTML += "<li data-ref="+i+">"+rs.rows.item(i).name+"</li>";
-					optOutput.innerHTML +="<option data-ref="+i+">"+rs.rows.item(i).name +"</option>";
+					optOutput.innerHTML +="<option value="+i+">"+rs.rows.item(i).name +"</option>";
 					console.info("Display items from database stuff");
 				}
             }, 
@@ -162,7 +134,7 @@ function displayOccasions() {
 				optOutput.innerHTML = "";
 				for (var i = 0; i < rs.rows.length; i++){
 					output[1].innerHTML += "<li data-ref="+i+">"+rs.rows.item(i).occ_name+"</li>";
-					optOutput.innerHTML +="<option data-ref="+i+">"+rs.rows.item(i).occ_name +"</option>";
+					optOutput.innerHTML +="<option value="+i+">"+rs.rows.item(i).occ_name +"</option>";
 					console.info("Display items from database occasions");
 				}
             }, 
@@ -172,15 +144,16 @@ function displayOccasions() {
     }, transErr, transSuccess);	
 }
 
-function displayOccasionGifts(){
+function displayPersonGifts(id){
+	console.log("passing: "+id);
 	db.transaction(function(trans){
-        trans.executeSql('SELECT * FROM gifts WHERE occ_id = 0', [], 
+        trans.executeSql('SELECT * FROM gifts WHERE person_id = ?', [personId], 
             function(tx, rs){
                 console.info("success on getting access to database gifts");
                 var output = document.querySelectorAll("[data-role=listview]");
-				output[3].innerHTML = "";
+				output[2].innerHTML = "";
 				for (var i = 0; i < rs.rows.length; i++){
-					output[3].innerHTML += "<li data-ref="+i+">"+rs.rows.item(i).gift_idea+"</li>";
+					output[2].innerHTML += "<li data-ref="+i+">"+rs.rows.item(i).gift_idea+"</li>";
 					console.info("Display items from database gifts");
 				}
             }, 
@@ -190,16 +163,16 @@ function displayOccasionGifts(){
     }, transErr, transSuccess);
 }
 
-/*function displayOccasionGifts(occId){
-	console.log("ohmy");
+function displayOccasionGifts(id){
+	console.log("passing occ: "+ id);
 	db.transaction(function(trans){
-        trans.executeSql('SELECT g.purchased, g.gift_id, g.gift_idea, o.occ_name FROM gifts AS g WHERE JOIN occasions AS o ON o.occ_id = g.occ_id WHERE g.person_id = ? ORDER BY o.occ_name, g.gift_idea', [occId], 
+        trans.executeSql('SELECT * FROM gifts WHERE occ_id = ?', [occasionId], 
             function(tx, rs){
                 console.info("success on getting access to database gifts");
                 var output = document.querySelectorAll("[data-role=listview]");
-				output[2].innerHTML = "";
+				output[3].innerHTML = "";
 				for (var i = 0; i < rs.rows.length; i++){
-					output[2].innerHTML += "<li data-ref="+i+">"+rs.rows.item(i).gift_name+"</li>";
+					output[3].innerHTML += "<li data-ref="+i+">"+rs.rows.item(i).gift_name+"</li>";
 					console.info("Display items from database gifts");
 				}
             }, 
@@ -207,7 +180,7 @@ function displayOccasionGifts(){
                 console.info( "error: "+err.message);
             });    
     }, transErr, transSuccess);
-}*/
+}
 
 function transErr(tx, err){
     console.info("Error processing transaction: " + err);
@@ -236,14 +209,14 @@ function addHammerEventListener(ev){
 	mcFour.on("tap", function(ev){
 		if(ev.target.parentNode.parentNode.getAttribute("id") == "people-list"){
 			alert("single tap one");
-			console.log(ev);
-			console.log(ev.target);
+			console.log("tap target person: "+ev.target);
 			document.getElementById("gifts-for-person").style.display = "block";
 			document.getElementById("gifts-for-occasion").style.display = "none";
 			showName(ev.target);
 		}
 		else if(ev.target.parentNode.parentNode.getAttribute("id") == "occasion-list"){
 			alert("single tap two");
+			console.log("tap target occasion: "+ev.target);
 			document.getElementById("gifts-for-person").style.display = "none";
 			document.getElementById("gifts-for-occasion").style.display = "block";
 			showOccasion(ev.target);
@@ -302,8 +275,8 @@ function buttonHandler(ev){
 	var btnAdd = document.querySelectorAll(".btnAdd");
 	btnAdd[0].addEventListener("click", openModalOne);
 	btnAdd[1].addEventListener("click", openModalTwo);
-	btnAdd[2].addEventListener("click", openModalFour);
-	btnAdd[3].addEventListener("click", openModalThree);
+	btnAdd[2].addEventListener("click", openModalThree);
+	btnAdd[3].addEventListener("click", openModalFour);
 }
 
 function openModalOne(ev){
@@ -341,18 +314,10 @@ function clearData(ev){
 }
 
 function showName(ev){
-	/*This is another way to achieve this
-	console.log(ev.parentNode.childNodes);
-	var indexNum = ev.getAttribute("data-ref");
-	var arr = ev.parentNode.childNodes[indexNum].innerHTML;
-	var span = document.getElementById("thePerson");
-	span.innerHTML = arr;*/
-	
 	//obtain person_id or occasion_id from data-ref index
 	var indexNum = ev.getAttribute("data-ref");
 	++indexNum;//an error was showing that indexNum is not a number, so I did this...
 	--indexNum;
-	console.log(indexNum+" being generated");
 	db.transaction(function(trans){
         trans.executeSql('SELECT * FROM stuff', [], 
             function(tx, rs){
@@ -366,68 +331,39 @@ function showName(ev){
             });    
     }, transErr, transSuccess);	
 	
-	//obtain occasion_id from option list
-	var curOptOcc = document.getElementById("list-occ");
-	var curValueOcc;
-	var allOptionsOcc = curOptOcc.querySelectorAll("option");
-	for (var i = 0; i < allOptionsOcc.length; i++){
-		if(allOptionsOcc[i].selected == true){
-			//curValueOcc = allOptionsOcc[i].getAttribute("data-ref");
-			curValueOcc = allOptionsOcc[i];
-		}
-	console.log("option occ:"+curValueOcc);
-	}
-	//obtain person_id from option list
-	var curOptPer = document.getElementById("list-per");
-	var curValuePer;
-	var allOptionsPer = curOptPer.querySelectorAll("option");
-	for (var i = 0; i < allOptionsPer.length; i++){
-		if(allOptionsPer[i].selected == true){
-			curValuePer = allOptionsPer[i].getAttribute("data-ref");
-		}
-	console.log("option per:"+curValuePer);
-	}
-	
-	//display all gifts for one occasion
+	//click save button to save new idea for this person
 	btnSave[2].addEventListener("click", function(){
-			var newGift = document.getElementById("new-idea-person").value;
-			var personId= 5;
-			var occasionId=indexNum;
-			var purchased=1;
-			console.log("user input: "+newGift);
-			if(newGift !== ""){
-				db.transaction(function(tx){
-					tx.executeSql('INSERT INTO gifts(person_id, occ_id, gift_idea, purchased)VALUES (?,?,?,?)',[personId, occasionId, newGift, purchased]);
-				});
-				closeModal();
-				displayOccasionGifts(indexNum);
+		alert("button 2");
+		var newGift = document.getElementById("new-idea-occasion").value;
+		 personId = indexNum;
+		 occasionId;
+		var purchased=1;
+		var occArray = occList.querySelectorAll("option");
+		for (var i = 0; i < occArray.length; i++){
+			if(occArray[i].selected == true){
+				occasionId = occArray[i].value;
 			}
-			else{alert("Please enter a new gift idea");}
-		});
-		
-	//display all gifts for one person
-	btnSave[3].addEventListener("click", function(){
-			var newGift = document.getElementById("new-idea-occasion").value;
-			var personId= curValuePer;
-			var occasionId=indexNum;
-			var purchased=1;
-			console.log("user input: "+newGift);
-			if(newGift !== ""){
-				db.transaction(function(tx){
-					tx.executeSql('INSERT INTO gifts(person_id, occ_id, gift_idea, purchased)VALUES (?,?,?,?)',[personId, occasionId, newGift, purchased]);
-				});
-				closeModal();
-				//displayPersonGifts(personId);
-			}
-			else{alert("Please enter a new gift idea");}
-		});
+		}
+		if(newGift !== ""){
+			db.transaction(function(tx){
+				tx.executeSql('INSERT INTO gifts(person_id, occ_id, gift_idea, purchased)VALUES (?,?,?,?)',[personId, occasionId, newGift, purchased]);
+			});
+			closeModal();
+			displayPersonGifts(personId);
+		}
+		else{alert("Please enter a new gift idea");}
+		console.log(occArray);
+		console.log("occasion ID: "+occasionId);
+		console.log("person ID: "+personId);
+		console.log("user input: "+newGift);
+	});
 }
+
 
 function showOccasion(ev){
 	var indexNum = ev.getAttribute("data-ref");
 	++indexNum;
 	--indexNum;
-	console.log(indexNum+" being generated again");
 	db.transaction(function(trans){
 		trans.executeSql('SELECT * FROM occasions', [], 
 			function(tx, rs){
@@ -440,4 +376,30 @@ function showOccasion(ev){
 				console.info( "error: "+err.message);
 			});    
 	}, transErr, transSuccess);	
+	//some comments
+	btnSave[3].addEventListener("click", function(){
+		alert("button 3");
+		var newGift = document.getElementById("new-idea-person").value;
+		 personId;
+		 occasionId = indexNum;
+		var purchased=1;
+		var perArray = perList.querySelectorAll("option");
+		for (var i = 0; i < perArray.length; i++){
+			if(perArray[i].selected == true){
+				personId = perArray[i].value;
+			}
+		}
+		if(newGift !== ""){
+			db.transaction(function(tx){
+				tx.executeSql('INSERT INTO gifts(person_id, occ_id, gift_idea, purchased)VALUES (?,?,?,?)',[personId, occasionId, newGift, purchased]);
+			});
+			closeModal();
+			displayOccasionGifts(occasionId);
+		}
+		else{alert("Please enter a new gift idea");}
+		console.log(perArray);
+		console.log("occasion ID: "+occasionId);
+		console.log("person ID: "+personId);
+		console.log("user input: "+newGift);
+	});
 }
