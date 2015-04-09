@@ -59,6 +59,18 @@ p{
   background-color:#666;
   box-shadow:1px 1px 2px rgb(0,0,0);
 }
+
+[data-role=page]#occasion-list{
+	display:none;
+}
+
+[data-role=page]#gifts-for-person{
+	display:none;
+}
+
+[data-role=page]#gifts-for-occasion{
+	display:none;
+}
 /*************************************
         Forms
 *************************************/
@@ -71,8 +83,10 @@ input, select{
   padding:0 1rem;
   max-width:90%; /* to make them responsive */
 }
-.btn{
+.btnAdd{
   width:auto;
+  padding-left:1%;
+  padding-right:1%;
 }
 .narrow{
   width:2rem;
